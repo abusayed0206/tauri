@@ -32,10 +32,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 20
           cache: npm
@@ -58,7 +58,7 @@ jobs:
       # Drop this step if you only want the MSIX bundle.
       # ----------------------------------------------------------------
       - name: Build Tauri app (NSIS)
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -85,7 +85,7 @@ jobs:
           if ($msix) { "MSIX_FILE=$($msix.FullName)" >> $env:GITHUB_ENV }
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           draft: false
           prerelease: false
