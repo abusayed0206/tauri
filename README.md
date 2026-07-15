@@ -16,6 +16,7 @@ This template is pre-wired with [`@choochmeque/tauri-windows-bundle`](https://gi
 - [Development commands](#development-commands)
 - [Build optimization](#build-optimization)
 - [Security defaults](#security-defaults)
+- [Local fonts](#local-fonts)
 - [Building the MSIX bundle](#building-the-msix-bundle)
 - [MSIX configuration explained](#msix-configuration-explained)
 - [App capabilities](#app-capabilities)
@@ -275,6 +276,81 @@ The CSP in `tauri.conf.json` is a good baseline. If you load external fonts, ima
 ```
 
 > **Avoid** `dangerousDisableAssetCspModification`, `dangerousRemoteUrlIpcAccess`, and broad `assetProtocol` scopes unless you fully understand the implications.
+
+---
+
+## Local fonts
+
+The `src/assets/fonts/` folder ships with a set of Bengali TTF files. You can use one font for the entire app, cherry-pick a few for different headings, or replace them with your own. **Vite only bundles fonts referenced in your CSS/TS/HTML** — fonts sitting unused in the folder are excluded from the release binary automatically.
+
+### How it works
+
+1. **`src/fonts.css`** holds one `@font-face` block per font (commented out by default).
+2. **`src/styles.css`** imports `fonts.css` with `@import "./fonts.css"`.
+3. The `url()` in each `@font-face` points into `src/assets/fonts/`. Vite rewrites those paths at build time and copies only the referenced `.ttf` files into the output.
+
+### Using a single font for the whole app
+
+1. Uncomment the `@font-face` block for the font you want in `src/fonts.css`.
+2. In `src/styles.css`, set `:root { font-family: "YourFontName", ...; }` instead of the default system stack:
+
+   ```css
+   :root {
+     font-family: "Bornomala", Inter, Avenir, Helvetica, Arial, sans-serif;
+   }
+   ```
+
+   The fallback fonts ensure that any characters not covered by your custom font still render.
+
+### Using multiple fonts
+
+Uncomment multiple `@font-face` blocks in `src/fonts.css`, then assign them to different elements in your CSS:
+
+```css
+body {
+  font-family: "Bornomala", sans-serif;
+}
+
+h1, h2 {
+  font-family: "BCC Purno Black Color", sans-serif;
+}
+
+code, pre {
+  font-family: "Ekush", monospace;
+}
+```
+
+### Adding your own fonts
+
+1. Drop the `.ttf` (or `.woff2`, `.otf`) file into `src/assets/fonts/`.
+2. Add an `@font-face` block in `src/fonts.css`:
+
+   ```css
+   @font-face {
+     font-family: "MyCustomFont";
+     src: url("./assets/fonts/MyCustomFont.ttf") format("truetype");
+     font-weight: 400;
+     font-style: normal;
+     font-display: swap;
+   }
+   ```
+3. Use `font-family: "MyCustomFont"` anywhere in your CSS.
+
+### What gets bundled
+
+| Font file in `src/assets/fonts/` | Referenced in `fonts.css`? | Included in binary? |
+|---|---|---|
+| `Bornomala-Regular.ttf` | Yes (uncommented `@font-face`) | ✅ bundled |
+| `kalpurush.ttf` | No (commented out or not declared) | ❌ excluded |
+| `Bangla.ttf` | No (commented out or not declared) | ❌ excluded |
+
+You can verify what's bundled by running `npm run build` and checking `dist/assets/` — only referenced `.ttf` files will appear.
+
+> **Why this works:** Vite processes every `url()` reference during the build. If a font file is never referenced by any `url()`, Vite never touches it. No extra config, no manual exclusion list — just declare what you use.
+
+### Replacing the font folder
+
+If you don't need Bengali fonts at all, delete `src/assets/fonts/` entirely and replace the `@font-face` blocks in `src/fonts.css` with your own. The `@import` in `styles.css` is the only wiring — everything else is up to you.
 
 ---
 

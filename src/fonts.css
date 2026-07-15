@@ -1,0 +1,78 @@
+/* ──────────────────────────────────────────────────────────────────
+ *  Local fonts
+ *  ──────────────────────────────────────────────────────────────────
+ *  All font files live in src/assets/fonts/.  Declare the ones you
+ *  actually use with @font-face below — Vite only bundles fonts that
+ *  are referenced somewhere in the CSS/TS/HTML.  Fonts that are never
+ *  referenced are NOT included in the release binary, so you can keep
+ *  every font file in the folder and only ship the ones you need.
+ *
+ *  ── Single font for the whole app ──────────────────────────────────
+ *  Declare one @font-face, then set it on :root (see styles.css).
+ *
+ *  ── Multiple fonts ─────────────────────────────────────────────────
+ *  Declare each @font-face with a different font-family name, then use
+ *  them per-element:  body { font-family: "Bornomala"; }
+ *                    h1   { font-family: "BCC Purno Black Color"; }
+ *
+ *  ── Weight / style variants ─────────────────────────────────────────
+ *  If a font ships separate files for bold/italic, add one @font-face
+ *  per variant with the same font-family but different font-weight /
+ *  font-style.  If you only have the Regular file, the browser will
+ *  synthesize bold/italic from it (font-synthesis is on by default).
+ *
+ *  ── Removing a font from the binary ─────────────────────────────────
+ *  Comment out or delete its @font-face block.  As long as nothing
+ *  references the file, Vite drops it from the build automatically.
+ *  You can verify with:  npm run build && ls dist/assets/*.ttf
+ * ────────────────────────────────────────────────────────────────── */
+
+/* Example — uncomment the blocks you need. */
+
+/* @font-face {
+  font-family: "Bornomala";
+  src: url("./assets/fonts/Bornomala-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+} */
+
+/* @font-face {
+  font-family: "Bornopata";
+  src: url("./assets/fonts/Bornopata-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+} */
+
+/* @font-face {
+  font-family: "Ekush";
+  src: url("./assets/fonts/Ekush-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+} */
+
+/* @font-face {
+  font-family: "Kalpurush";
+  src: url("./assets/fonts/kalpurush.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+} */
+
+/* @font-face {
+  font-family: "Bangla";
+  src: url("./assets/fonts/Bangla.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+} */
+
+/* @font-face {
+  font-family: "BCC Purno Black Color";
+  src: url("./assets/fonts/BCC Purno Black Color.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+} */
