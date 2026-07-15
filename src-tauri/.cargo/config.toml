@@ -1,0 +1,34 @@
+# .cargo/config.toml
+# Build optimizations for Windows MSVC targets.
+# Picked up automatically by cargo when building from src-tauri/.
+
+# ── Static CRT + lld linker (stable, always on) ─────────────────────
+# +crt-static  → statically links the Visual C++ Runtime so the exe/MSIX
+#                doesn't depend on the VC++ redistributable on the target
+#                machine. Essential for clean MSIX packages.
+# rust-lld.exe → LLVM's lld linker, shipped with Rust. 2-5x faster
+#                linking than the default MSVC link.exe. Speeds up both
+#                dev iteration and CI release builds.
+
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
+linker = "rust-lld.exe"
+
+[target.aarch64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
+linker = "rust-lld.exe"
+
+# ── Parallel frontend (Nightly only) ────────────────────────────────
+# Uncomment after switching to nightly (rustup default nightly) for
+# faster cargo check / cargo build analysis passes.
+# Forces the compiler frontend to use parallel threads during parsing.
+#
+# [build]
+# rustflags = ["-Z", "threads=8"]
+#
+# ── Cranelift codegen backend (Nightly only, dev builds) ───────────
+# Swaps LLVM for Cranelift during debug builds — compiles unoptimized
+# machine code almost instantly. Great for local iteration.
+#   1. rustup default nightly
+#   2. rustup component add rustc-codegen-cranelift-preview
+#   3. Uncomment codegen-backend in Cargo.toml [profile.dev]

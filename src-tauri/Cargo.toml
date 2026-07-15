@@ -1,0 +1,40 @@
+[package]
+name = "myapp"
+version = "0.1.0"
+description = "A MyApp built with Tauri"
+authors = ["you"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "myapp_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# ── Release profile: smallest, fastest binary ──────────────────────
+# Applied automatically to `tauri build`, `tauri-windows-bundle build`,
+# and CI release builds. Not used during `tauri dev`.
+[profile.release]
+panic = "abort"      # Disables panic unwinding; removes heavy cleanup code
+codegen-units = 1    # Maximizes LLVM's cross-crate optimization
+lto = true           # Link-Time Optimization across all crates
+opt-level = "s"      # Optimize for binary size (use "z" for even smaller, "3" for max speed)
+strip = true         # Remove all debug symbols and tables
+
+# ── Dev profile: fast iteration ────────────────────────────────────
+# Cranelift backend (Nightly only) — see .cargo/config.toml for setup.
+# Uncomment after installing the rustc-codegen-cranelift-preview component.
+[profile.dev]
+# codegen-backend = "cranelift"

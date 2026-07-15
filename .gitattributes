@@ -1,0 +1,52 @@
+# Auto-detect text files, normalize to LF in repo, native EOL on checkout
+* text=auto
+
+# Windows scripts — force CRLF (Windows script hosts require it)
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# Shell scripts — force LF (shebangs require it)
+*.sh   text eol=lf
+
+# Visual Studio / MSBuild project files — Windows tooling expects CRLF
+*.sln        text eol=crlf
+*.csproj     text eol=crlf
+*.vcxproj    text eol=crlf
+*.vcxitems   text eol=crlf
+*.props      text eol=crlf
+*.filters    text eol=crlf
+
+# Source code — LF in repo, native on checkout
+*.rs    text
+*.toml  text
+*.ts    text
+*.tsx   text
+*.js    text
+*.jsx   text
+*.json  text
+*.css   text
+*.html  text
+*.md    text
+*.yml   text
+*.yaml  text
+
+# Lockfiles — LF
+*.lock  text
+
+# Config files — LF
+.editorconfig   text eol=lf
+.gitattributes  text eol=lf
+.gitignore      text
+
+# Binaries — never touch
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.icns  binary
+*.msi   binary
+*.exe   binary
+*.msix  binary
+*.msixbundle binary

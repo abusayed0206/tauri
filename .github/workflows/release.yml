@@ -1,0 +1,97 @@
+name: Build and Release
+
+# Builds a Windows NSIS installer + an (unsigned) MSIX bundle for the
+# Microsoft Store, then publishes a GitHub Release with both artifacts.
+#
+# Triggers:
+#   - Push of a tag matching `v*`  (e.g. v1.0.0)
+#   - Manual run from the Actions tab (workflow_dispatch)
+#
+# This template targets x64 only. To add arm64, see the README.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: windows-latest
+
+    # Build optimizations are driven by src-tauri/.cargo/config.toml
+    # (lld linker + static CRT) and Cargo.toml [profile.release]
+    # (LTO, codegen-units=1, opt-level=s, strip, panic=abort).
+    # These env vars add a few CI-specific tweaks.
+    env:
+      CARGO_INCREMENTAL: "0"       # LTO + incremental don't mix; cargo disables it anyway, but be explicit
+      CARGO_NET_RETRY: "5"         # Retry flaky crate downloads
+      RUSTUP_MAX_ROOT_SIZE: "2GB"  # Headroom for multi-arch toolchains
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      # ----------------------------------------------------------------
+      # NSIS installer (.exe) — convenient sideload installer.
+      # Drop this step if you only want the MSIX bundle.
+      # ----------------------------------------------------------------
+      - name: Build Tauri app (NSIS)
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --bundles nsis --target x86_64-pc-windows-msvc
+
+      # ----------------------------------------------------------------
+      # MSIX bundle for the Microsoft Store.
+      # Produces an UNSIGNED .msixbundle (Store re-signs on submission).
+      # x64 only — add `,arm64` and install the aarch64 target for multi-arch.
+      # ----------------------------------------------------------------
+      - name: Build Store MSIX bundle
+        run: npm run msix:build -- --runner npm
+
+      - name: Locate built artifacts
+        id: find_artifacts
+        shell: pwsh
+        run: |
+          $nsis = Get-ChildItem -Path src-tauri/target/release/bundle/nsis/*.exe -ErrorAction SilentlyContinue | Select-Object -First 1
+          $msix = Get-ChildItem -Path src-tauri/target/msix/*.msixbundle -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $msix) {
+            $msix = Get-ChildItem -Path src-tauri/target/msix/*.msix -ErrorAction SilentlyContinue | Select-Object -First 1
+          }
+          if ($nsis) { "NSIS_FILE=$($nsis.FullName)" >> $env:GITHUB_ENV }
+          if ($msix) { "MSIX_FILE=$($msix.FullName)" >> $env:GITHUB_ENV }
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            ${{ env.NSIS_FILE }}
+            ${{ env.MSIX_FILE }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

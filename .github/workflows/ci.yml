@@ -1,0 +1,63 @@
+name: CI
+
+# Runs on every push and pull request to catch issues before they land.
+# The release pipeline (.github/workflows/release.yml) is separate and
+# only triggers on v* tags.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  # ── Frontend: typecheck + build ───────────────────────────────────
+  frontend:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build frontend
+        run: npm run build
+
+  # ── Rust: fmt + clippy + test ─────────────────────────────────────
+  rust:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Check formatting
+        working-directory: src-tauri
+        run: cargo fmt --check
+
+      - name: Clippy
+        working-directory: src-tauri
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Tests
+        working-directory: src-tauri
+        run: cargo test

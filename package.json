@@ -1,0 +1,35 @@
+{
+  "name": "myapp",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:build:debug": "tauri build --debug",
+    "tauri:icon": "tauri icon",
+    "msix:build": "tauri-windows-bundle build",
+    "msix:build:multi": "tauri-windows-bundle build --arch x64,arm64",
+    "msix:build:debug": "tauri-windows-bundle build --debug",
+    "msix:init": "tauri-windows-bundle init"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-opener": "^2"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "@types/node": "^22",
+    "vite": "^6.0.3",
+    "typescript": "~5.6.2",
+    "@choochmeque/tauri-windows-bundle": "^0.1.28"
+  }
+}

@@ -1,0 +1,7 @@
+[toolchain]
+# Pin to stable so every clone gets a consistent, modern toolchain.
+# Override locally with `rustup override set nightly` if you want the
+# Cranelift dev backend (see README → Build optimization).
+channel = "stable"
+components = ["rustfmt", "clippy"]
+targets = ["x86_64-pc-windows-msvc"]
