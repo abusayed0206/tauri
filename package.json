@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
-    "@types/node": "^22",
+    "@types/node": "^26",
     "vite": "^6.0.3",
     "typescript": "~7.0.2",
     "@choochmeque/tauri-windows-bundle": "^0.1.28"
